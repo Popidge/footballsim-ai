@@ -31,6 +31,9 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "dev": "tsc --watch",
+    "prototype:dev": "vite --host 0.0.0.0",
+    "prototype:build": "vite build",
+    "prototype:preview": "vite preview --host 0.0.0.0",
     "prepublishOnly": "npm run build",
     "format": "prettier --write .",
     "lint:check": "eslint .",
@@ -87,6 +90,9 @@
     "@semantic-release/npm": "^13.1.3",
     "@stylistic/eslint-plugin": "^5.7.0",
     "@types/node": "^25.0.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.16",
     "@vitest/ui": "^4.0.16",
     "ast-types": "^0.14.2",
@@ -115,6 +121,7 @@
     "typescript": "^5.9.3",
     "typescript-coverage-report": "^1.1.1",
     "typescript-eslint": "^8.51.0",
+    "vite": "^7.3.6",
     "vitest": "^4.0.16"
   },
   "lint-staged": {
@@ -126,5 +133,9 @@
       "prettier --write"
     ]
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  }
 }
