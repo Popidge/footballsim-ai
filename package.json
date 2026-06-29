@@ -22,7 +22,11 @@
       "types": "./dist/engine.d.ts",
       "import": "./dist/engine.js"
     },
-    "./lib/*": "./dist/lib/*"
+    "./lib/*": "./dist/lib/*",
+    "./app/matchRuntime": {
+      "types": "./dist/app/matchRuntime.d.ts",
+      "import": "./dist/app/matchRuntime.js"
+    }
   },
   "scripts": {
     "build": "tsc && tsc-alias",
