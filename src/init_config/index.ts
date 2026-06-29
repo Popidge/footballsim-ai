@@ -6,16 +6,16 @@ import {
   createMatchSession,
   startSecondHalfForSession,
 } from '../app/matchRuntime.js';
-import type { MatchSession } from '../app/matchRuntime.js';
-import type { MatchDetails, PitchDetails, Team } from '../lib/types.js';
+import type { MatchSession, MatchSnapshot } from '../app/matchRuntime.js';
+import type { PitchDetails, Team } from '../lib/types.js';
 
-let nextIteration: MatchDetails;
+let nextIteration: MatchSnapshot;
 
 async function init(): Promise<void> {
   await gameOfTenIterations();
 }
 
-async function gameOfTenIterations(): Promise<MatchDetails> {
+async function gameOfTenIterations(): Promise<MatchSnapshot> {
   const t1location = './team1.json';
 
   const t2location = './team2.json';
@@ -24,9 +24,9 @@ async function gameOfTenIterations(): Promise<MatchDetails> {
 
   const session = await initGame(t1location, t2location, plocation);
 
-  nextIteration = advanceMatch(session, { iterations: 5 }) as MatchDetails;
-  nextIteration = startSecondHalfForSession(session) as MatchDetails;
-  nextIteration = advanceMatch(session, { iterations: 5 }) as MatchDetails;
+  nextIteration = advanceMatch(session, { iterations: 5 });
+  nextIteration = startSecondHalfForSession(session);
+  nextIteration = advanceMatch(session, { iterations: 5 });
 
   return nextIteration;
 }

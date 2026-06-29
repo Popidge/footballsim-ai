@@ -4,6 +4,8 @@ import type { MatchDetails, PitchDetails, Team } from '../lib/types.js';
 
 interface MatchSessionState {
   matchDetails: MatchDetails;
+  rngStep: number;
+  seed: number;
 }
 
 const sessionState = new WeakMap<MatchSession, MatchSessionState>();
@@ -35,24 +37,18 @@ type DeepReadonly<T> = T extends (...args: never[]) => unknown
 type MatchSnapshot = DeepReadonly<MatchDetails>;
 
 function createMatchSession(options: CreateMatchSessionOptions): MatchSession {
-  if (options.seed !== undefined) {
-    setMatchSeed(options.seed);
-  }
+  const seed = options.seed ?? numericSeedFromMatchID(stableSeedInput(options));
+
+  setMatchSeed(seed);
 
   const matchDetails = initiateGame(options.team1, options.team2, options.pitch);
-
-  const seed = options.seed ?? numericSeedFromMatchID(matchDetails.matchID);
-
-  if (options.seed === undefined) {
-    setMatchSeed(seed);
-  }
 
   const session: MatchSession = {
     matchID: matchDetails.matchID,
     seed,
   };
 
-  sessionState.set(session, { matchDetails });
+  sessionState.set(session, { matchDetails, rngStep: 1, seed });
 
   return session;
 }
@@ -65,7 +61,9 @@ function advanceMatch(session: MatchSession, options: AdvanceMatchOptions): Matc
   }
 
   for (let iteration = 0; iteration < options.iterations; iteration++) {
+    setMatchSeed(seedForStep(state));
     state.matchDetails = playIteration(state.matchDetails);
+    state.rngStep++;
   }
 
   return cloneSnapshot(state.matchDetails);
@@ -74,7 +72,9 @@ function advanceMatch(session: MatchSession, options: AdvanceMatchOptions): Matc
 function startSecondHalfForSession(session: MatchSession): MatchSnapshot {
   const state = getSessionState(session);
 
+  setMatchSeed(seedForStep(state));
   state.matchDetails = startSecondHalf(state.matchDetails);
+  state.rngStep++;
 
   return cloneSnapshot(state.matchDetails);
 }
@@ -93,8 +93,25 @@ function getSessionState(session: MatchSession): MatchSessionState {
   return state;
 }
 
+function seedForStep(state: MatchSessionState): number {
+  return numericSeedFromMatchID(`${state.seed}:${state.rngStep}`);
+}
+
+function stableSeedInput(options: CreateMatchSessionOptions): string {
+  return JSON.stringify({ pitch: options.pitch, team1: options.team1, team2: options.team2 });
+}
+
 function numericSeedFromMatchID(matchID: MatchDetails['matchID']): number {
-  return Number.parseInt(String(matchID).slice(-9), 10);
+  const input = String(matchID);
+
+  let hash = 0x811c9dc5;
+
+  for (const character of input) {
+    hash ^= character.codePointAt(0) ?? 0;
+    hash = Math.imul(hash, 0x01000193);
+  }
+
+  return hash >>> 0;
 }
 
 function cloneSnapshot(matchDetails: MatchDetails): MatchSnapshot {
