@@ -6,7 +6,7 @@
 *.md text
 *.yml text
 
-package-lock.json binary
+package-lock.json text eol=lf
 
 .husky/* text eol=lf
 *.sh text eol=lf

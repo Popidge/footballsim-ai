@@ -21,6 +21,8 @@ interface AdvanceMatchOptions {
   iterations: number;
 }
 
+type MatchSessionMutator<T> = (matchDetails: MatchDetails) => T;
+
 interface MatchSession {
   readonly matchID: MatchDetails['matchID'];
   readonly seed?: number;
@@ -83,6 +85,20 @@ function getMatchSnapshot(session: MatchSession): MatchSnapshot {
   return cloneSnapshot(getSessionState(session).matchDetails);
 }
 
+function updateMatchSession<T>(
+  session: MatchSession,
+  mutator: MatchSessionMutator<T>,
+): {
+  result: T;
+  snapshot: MatchSnapshot;
+} {
+  const state = getSessionState(session);
+
+  const result = mutator(state.matchDetails);
+
+  return { result, snapshot: cloneSnapshot(state.matchDetails) };
+}
+
 function getSessionState(session: MatchSession): MatchSessionState {
   const state = sessionState.get(session);
 
@@ -122,7 +138,14 @@ export type {
   AdvanceMatchOptions,
   CreateMatchSessionOptions,
   DeepReadonly,
+  MatchSessionMutator,
   MatchSession,
   MatchSnapshot,
 };
-export { advanceMatch, createMatchSession, getMatchSnapshot, startSecondHalfForSession };
+export {
+  advanceMatch,
+  createMatchSession,
+  getMatchSnapshot,
+  startSecondHalfForSession,
+  updateMatchSession,
+};

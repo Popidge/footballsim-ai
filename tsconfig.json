@@ -14,6 +14,8 @@
     "noUnusedParameters": true,
 
     "allowJs": true,
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -26,6 +28,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "init_config/**/*"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "init_config/**/*", "vite.config.ts"],
   "exclude": ["node_modules", "dist", "coverage"]
 }
